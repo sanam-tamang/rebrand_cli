@@ -3,6 +3,16 @@ import 'dart:io';
 import 'package:rebrand_cli/rebrand_config.dart';
 import 'package:rebrand_cli/rebrand_service.dart';
 
+/// Entry point for the Rebrand CLI tool.
+///
+/// This CLI automates the Flutter app rebranding process by:
+/// - Validating the Flutter project structure
+/// - Reading configuration from `rebrand_config.json`
+/// - Updating package names, app labels, and generating assets
+/// - Syncing dependencies and cleaning up the project
+///
+/// The tool must be run from the root directory of a Flutter project
+/// and requires a valid `rebrand_config.json` configuration file.
 void main() async {
   // ANSI Color Codes
   const cyan = '\x1B[36m';
@@ -13,7 +23,7 @@ void main() async {
   // 1. Welcome Banner
   print('''
 $cyan+------------------------------------------+
-|          🚀 REBRAND CLI v1.0.0           |
+|          🚀 REBRAND CLI v1.0.2           |
 |      Automated Flutter Rebranding        |
 +------------------------------------------+$reset
 ''');

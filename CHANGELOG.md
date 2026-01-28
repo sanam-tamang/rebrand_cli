@@ -9,3 +9,7 @@
 
 ## 1.0.1
 - Updated documentation and README instructions.
+
+
+## 1.0.2
+- Documentation improvements and enhancements.

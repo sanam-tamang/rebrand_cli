@@ -1,11 +1,37 @@
 import 'dart:io';
 import 'rebrand_config.dart';
 
+/// Service class responsible for orchestrating the Flutter app rebranding process.
+///
+/// This service handles the complete rebranding workflow including:
+/// - Installing required dependencies
+/// - Updating package names and bundle IDs
+/// - Modifying native app labels for Android and iOS
+/// - Generating app icons and splash screens
+/// - Syncing project dependencies and CocoaPods
+///
+/// The service operates on a [RebrandConfig] instance that contains all
+/// necessary configuration data for the rebranding process.
 class RebrandService {
+  /// The configuration object containing rebranding parameters.
   final RebrandConfig config;
 
+  /// Creates a new [RebrandService] with the given [config].
   RebrandService(this.config);
 
+  /// Executes the complete rebranding workflow.
+  ///
+  /// This method orchestrates all rebranding steps in the correct order:
+  /// 1. Sets up required dependencies
+  /// 2. Changes package ID (Bundle IDs)
+  /// 3. Updates Android app labels
+  /// 4. Updates iOS app labels
+  /// 5. Generates app icons and splash screens
+  /// 6. Performs project cleanup
+  /// 7. Syncs project dependencies
+  /// 8. Syncs iOS CocoaPods (macOS only)
+  ///
+  /// Throws an exception if any critical step fails.
   Future<void> execute() async {
     // 1. Setup Environment & Workers
     await _setupDependencies();
@@ -42,7 +68,13 @@ class RebrandService {
     print("\n✅ Project is synced and ready!");
   }
 
-  // Specialized helper for iOS Pods
+  /// Syncs iOS CocoaPods dependencies.
+  ///
+  /// This method runs `pod install` in the iOS directory to ensure
+  /// all native iOS dependencies are properly installed and configured.
+  ///
+  /// Only executes on macOS platforms. Prints a warning if the sync fails
+  /// but does not throw an exception, allowing the rebranding process to continue.
   Future<void> _runPodInstall() async {
     print("🔹 Syncing iOS CocoaPods...");
     // We use Directory changes because Process.run starts from the root
@@ -62,6 +94,15 @@ class RebrandService {
     }
   }
 
+  /// Validates and installs required worker packages.
+  ///
+  /// Checks if the following packages are present in pubspec.yaml:
+  /// - change_app_package_name
+  /// - flutter_launcher_icons
+  /// - flutter_native_splash
+  ///
+  /// If any packages are missing, they are automatically installed as
+  /// dev dependencies using `flutter pub add --dev`.
   Future<void> _setupDependencies() async {
     print("📦 Validating Worker Packages...");
     final pubspec = File('pubspec.yaml').readAsStringSync();
@@ -83,6 +124,12 @@ class RebrandService {
     }
   }
 
+  /// Updates the Android app label in AndroidManifest.xml.
+  ///
+  /// Modifies the `android:label` attribute in the manifest file to reflect
+  /// the new app name. This changes the name displayed on the Android home screen.
+  ///
+  /// [name] The new app name to set.
   void _updateAndroidName(String name) {
     print("🤖 Updating Android App Label...");
     final manifest = File('android/app/src/main/AndroidManifest.xml');
@@ -97,6 +144,13 @@ class RebrandService {
     }
   }
 
+  /// Updates the iOS app name in Info.plist.
+  ///
+  /// Modifies both `CFBundleName` and `CFBundleDisplayName` keys in the
+  /// Info.plist file to reflect the new app name. This changes the name
+  /// displayed on the iOS home screen.
+  ///
+  /// [name] The new app name to set.
   void _updateIosName(String name) {
     print("🍎 Updating iOS App Name...");
     final plist = File('ios/Runner/Info.plist');
@@ -116,6 +170,20 @@ class RebrandService {
     }
   }
 
+  /// Generates app icons and splash screens.
+  ///
+  /// Creates a temporary YAML configuration file and uses flutter_native_splash
+  /// to generate platform-specific splash screens for Android (including Android 12)
+  /// and iOS.
+  ///
+  /// The method:
+  /// 1. Validates that the icon image exists
+  /// 2. Extracts splash configuration with fallback defaults
+  /// 3. Creates a temporary configuration file
+  /// 4. Runs the splash screen generator
+  /// 5. Cleans up the temporary file
+  ///
+  /// Exits with code 1 if the icon image is not found.
   Future<void> _generateAssets() async {
     final tempYaml = File('rebrand_temp.yaml');
 
@@ -152,6 +220,16 @@ flutter_native_splash:
     if (tempYaml.existsSync()) tempYaml.deleteSync();
   }
 
+  /// Executes a shell command and handles errors.
+  ///
+  /// Runs the specified command using [Process.run] and prints progress
+  /// information. If the command fails (non-zero exit code), prints
+  /// detailed error information and exits the process.
+  ///
+  /// [cmd] The command string to execute (space-separated).
+  /// [desc] A human-readable description of what the command does.
+  ///
+  /// Exits with code 1 if the command fails.
   Future<void> _run(String cmd, String desc) async {
     print("🔹 $desc...");
     final parts = cmd.split(' ');
