@@ -18,3 +18,7 @@
 
 ## 1.0.3
 - Documentation improvements and enhancements.
+
+
+## 1.0.4
+- Fixed version banner mismatch in CLI output.

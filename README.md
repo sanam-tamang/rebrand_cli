@@ -16,11 +16,60 @@ A powerful, zero-setup CLI tool for Flutter developers to fully rebrand an appli
 
 ## 🛠 Installation
 
+### Step 1: Install the Package
+
 Activate the package globally using Dart:
 
 ```bash
 dart pub global activate rebrand_cli
 ```
+
+### Step 2: Add to PATH (if `rebrand` command not found)
+
+After installation, if you get "command not found: rebrand", you need to add the Dart pub cache bin directory to your system PATH.
+
+#### macOS / Linux
+
+Add the following line to your shell configuration file (`~/.zshrc`, `~/.bashrc`, or `~/.bash_profile`):
+
+```bash
+export PATH="$PATH:$HOME/.pub-cache/bin"
+```
+
+Then reload your shell:
+
+```bash
+source ~/.zshrc  # or source ~/.bashrc
+```
+
+#### Windows (PowerShell)
+
+Add to your PowerShell profile or run:
+
+```powershell
+$env:Path += ";$env:LOCALAPPDATA\Pub\Cache\bin"
+```
+
+To make it permanent, add to your system environment variables:
+1. Press `Win + X` → Select "System"
+2. Click "Advanced system settings" → "Environment Variables"
+3. Under "User variables", find `Path` and click "Edit"
+4. Add: `%LOCALAPPDATA%\Pub\Cache\bin`
+5. Click "OK" and restart your terminal
+
+#### Windows (Command Prompt)
+
+```cmd
+set PATH=%PATH%;%LOCALAPPDATA%\Pub\Cache\bin
+```
+
+### Verify Installation
+
+```bash
+rebrand
+```
+
+You should see the Rebrand CLI banner if installed correctly.
 
 ---
 
