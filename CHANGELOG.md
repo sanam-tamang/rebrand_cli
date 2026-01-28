@@ -20,7 +20,7 @@
 - Documentation improvements and enhancements.
 
 
-## 1.0.4
-- Fixed version banner mismatch in CLI output.
-- Added comprehensive PATH setup instructions for Windows, macOS, and Linux.
+## 1.0.5
 - Added documentation for running the tool directly with `dart pub global run` syntax.
+- Enhanced README with clear instructions for both `rebrand` and `dart pub global run rebrand_cli:rebrand` commands.
+- Improved CHANGELOG documentation for all versions.
