@@ -22,3 +22,5 @@
 
 ## 1.0.4
 - Fixed version banner mismatch in CLI output.
+- Added comprehensive PATH setup instructions for Windows, macOS, and Linux.
+- Added documentation for running the tool directly with `dart pub global run` syntax.

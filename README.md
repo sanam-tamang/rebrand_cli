@@ -69,6 +69,14 @@ set PATH=%PATH%;%LOCALAPPDATA%\Pub\Cache\bin
 rebrand
 ```
 
+**Alternative: Run directly without adding to PATH**
+
+If you don't want to modify your PATH, you can run the tool directly:
+
+```bash
+dart pub global run rebrand_cli:rebrand
+```
+
 You should see the Rebrand CLI banner if installed correctly.
 
 ---
@@ -123,6 +131,12 @@ Open your terminal, navigate to your Flutter project root, and run:
 
 ```bash
 rebrand
+```
+
+**Alternative: Run directly without adding to PATH**
+
+```bash
+dart pub global run rebrand_cli:rebrand
 ```
 
 That's it! The tool will automatically:
