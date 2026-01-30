@@ -45,18 +45,30 @@ class AssetGenerationTask extends RebrandTask {
 
   @override
   Future<void> execute() async {
-    // Extract scaling from config, default to 0.65 if not present
-    final double scaling =
-        (config.splash['scaling'] as num?)?.toDouble() ?? 0.65;
+    if (config.iconPath == null) {
+      print("⚠️ Skipping Asset Generation: icon_path is missing.");
+      return;
+    }
 
-    final processedImage = processImage(config.iconPath, scaling: scaling);
+    // Use the scaling factor from the configuration
+    final processedImage = processImage(
+      config.iconPath!,
+      scaling: config.splashScreenScale,
+    );
 
     // Save the processed image for the native generators to use
     final processedPath = 'rebrand_processed_asset.png';
     File(processedPath).writeAsBytesSync(img.encodePng(processedImage));
 
-    // Generate the splash using the perfectly padded image
-    await _writeAndRunSplash(processedPath);
+    if (config.enableSplash && config.splash != null) {
+      // Generate the splash using the perfectly padded image
+      await _writeAndRunSplash(processedPath);
+    }
+
+    if (config.enableLauncherIcon) {
+      // Generate launcher icons using the original image (no scaling)
+      await _writeAndRunIcons(config.iconPath!);
+    }
 
     // Cleanup the temporary processed image
     if (File(processedPath).existsSync()) {
@@ -64,9 +76,37 @@ class AssetGenerationTask extends RebrandTask {
     }
   }
 
+  Future<void> _writeAndRunIcons(String imagePath) async {
+    final tempYaml = File('rebrand_icons_temp.yaml');
+    final color = config.splash?['color'] ?? "#FFFFFF";
+
+    tempYaml.writeAsStringSync('''
+flutter_launcher_icons:
+  android: ${config.enableAndroid ? '"launcher_icon"' : 'false'}
+  ios: ${config.enableIOS}
+  image_path: "$imagePath"
+  min_sdk_android: 21
+  adaptive_icon_background: "$color"
+  adaptive_icon_foreground: "$imagePath"
+''');
+
+    final result = await Process.run('dart', [
+      'run',
+      'flutter_launcher_icons',
+      '-f',
+      'rebrand_icons_temp.yaml',
+    ], runInShell: true);
+
+    if (result.exitCode != 0) {
+      throw "Failed to generate launcher icons: ${result.stderr}";
+    }
+
+    tempYaml.deleteSync();
+  }
+
   Future<void> _writeAndRunSplash(String imagePath) async {
     final tempYaml = File('rebrand_temp.yaml');
-    final color = config.splash['color'] ?? "#FFFFFF";
+    final color = config.splash?['color'] ?? "#FFFFFF";
 
     tempYaml.writeAsStringSync('''
 flutter_native_splash:
@@ -74,8 +114,8 @@ flutter_native_splash:
   image: "$imagePath"
   android_gravity: center
   ios_content_mode: center
-  android: true
-  ios: true
+  android: ${config.enableAndroid}
+  ios: ${config.enableIOS}
   android_12:
     image: "$imagePath"
     color: "$color"

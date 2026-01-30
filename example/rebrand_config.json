@@ -1,7 +1,13 @@
 {
     "app_name": "Rebranded App",
-    "package_name": "com.rebranded.app",
+    "package_name": "com.rebranded11.app",
     "icon_path": "assets/logo.png",
+    "enable_splash": true,
+    "enable_launcher_icon": true,
+    "enable_package_rename": true,
+    "enable_app_label": true,
+    "enable_android": true,
+    "enable_ios": true,
     "splash_config": {
         "color": "#FFFFFF",
         "image": "assets/logo.png",

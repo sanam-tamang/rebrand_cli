@@ -8,23 +8,37 @@ import 'tasks/package_rename_task.dart';
 import 'tasks/project_sync_task.dart';
 import 'tasks/rebrand_task.dart';
 import 'tasks/setup_dependencies_task.dart';
+import 'tasks/validation_task.dart';
 
 class RebrandService {
   final RebrandConfig config;
+
   final List<RebrandTask>? tasks;
 
   RebrandService(this.config, {this.tasks});
 
   Future<void> execute() async {
-    final List<RebrandTask> tasksToRun = tasks ??
-        [
-          BackupTask(),
-          SetupDependenciesTask(),
-          PackageRenameTask(config.packageName),
-          LabelUpdateTask(config.appName),
-          AssetGenerationTask(config),
-          ProjectSyncTask(),
-        ];
+    final List<RebrandTask> tasksToRun = tasks ?? [];
+
+    if (tasks == null) {
+      tasksToRun.add(ValidationTask(config));
+      tasksToRun.add(BackupTask());
+      tasksToRun.add(SetupDependenciesTask());
+
+      if (config.enablePackageRename && config.packageName != null) {
+        tasksToRun.add(PackageRenameTask(config));
+      }
+
+      if (config.enableAppLabel && config.appName != null) {
+        tasksToRun.add(LabelUpdateTask(config));
+      }
+
+      if (config.enableSplash || config.enableLauncherIcon) {
+        tasksToRun.add(AssetGenerationTask(config));
+      }
+
+      tasksToRun.add(ProjectSyncTask(config));
+    }
 
     print("🚀 Rebrand Orchestrator Started...");
 
@@ -57,7 +71,7 @@ class RebrandService {
       final backupSource = await FileSystemEntity.isDirectory(backupSourcePath)
           ? Directory(backupSourcePath)
           : File(backupSourcePath);
-      
+
       if (!await backupSource.exists()) continue;
 
       if (backupSource is Directory) {
@@ -73,7 +87,7 @@ class RebrandService {
 
     _cleanupBackup();
     print("✅ Project restored. Please fix the error and try again.");
-    exit(1);
+    throw "Rebranding failed and project was rolled back.";
   }
 
   void _cleanupBackup() {

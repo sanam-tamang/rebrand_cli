@@ -105,13 +105,17 @@ your_flutter_project/
 
 ### Step 2: Create Configuration File
 
-In the **root directory** of your Flutter project, create a file named `rebrand_config.json`:
+In the **root directory** of your Flutter project, create a file named `rebrand_config.json`. All fields are optional, but you must provide at least one action.
 
 ```json
 {
     "app_name": "My New App",
     "package_name": "com.newcompany.app",
     "icon_path": "assets/logo.png",
+    "enable_splash": true,
+    "enable_launcher_icon": true,
+    "enable_package_rename": true,
+    "enable_app_label": true,
     "splash_config": {
         "color": "#FFFFFF",
         "image": "assets/logo.png",
@@ -123,15 +127,22 @@ In the **root directory** of your Flutter project, create a file named `rebrand_
 ```
 
 **Configuration Options:**
-- `app_name`: The display name of your app (shown on home screen)
-- `package_name`: Your new package/bundle identifier (e.g., `com.yourcompany.appname`)
-- `icon_path`: Path to your app icon image
-- `splash_config`: 
+- `app_name`: (Optional) The display name of your app (shown on home screen).
+- `package_name`: (Optional) Your new package/bundle identifier (e.g., `com.yourcompany.appname`).
+- `icon_path`: (Optional) Path to your app icon image.
+- `enable_splash`: (Optional) Enable/disable splash screen generation. Defaults to `true` if `splash_config` is present.
+- `enable_launcher_icon`: (Optional) Enable/disable launcher icon generation. Defaults to `true` if `icon_path` is present.
+- `enable_package_rename`: (Optional) Enable/disable package renaming. Defaults to `true` if `package_name` is present.
+- `enable_app_label`: (Optional) Enable/disable app label update. Defaults to `true` if `app_name` is present.
+- `enable_android`: (Optional) Enable/disable rebranding for Android. Defaults to `true`.
+- `enable_ios`: (Optional) Enable/disable rebranding for iOS. Defaults to `true`.
+- `splash_config`: (Optional)
   - `color`: Background color for splash screen (light mode)
   - `image`: Path to splash screen image. The tool will automatically use the `icon_path` if this is not provided.
   - `dark_color`: Background color for splash screen (dark mode) - optional.
   - `gravity`: (Optional) The gravity of the splash screen image. Can be `center`, `fill`, `bottom`, `top`, `left`, `right`. Defaults to `center`. **Note:** The new Auto-Padding Engine will process your image to fit a safe zone, so `center` is recommended.
-  - `scaling`: (Optional) Scale factor for the logo within the splash screen safe zone (0.0 to 1.0). Defaults to `0.65` (65%). Use `0.8` or higher if you want the logo to be larger, but be careful of cropping on Android 12+.
+  - `scaling`: (Optional) Scale factor for the logo within the splash screen safe zone (0.0 to 1.0). Defaults to `0.65` (65%). 
+    > **Why scaling?** Android 12+ introduces a splash screen API that masks the icon in a circle. If your logo touches the edges, it will be cropped. Scaling ensures it fits safely within the circle.
 
 ### Step 3: Run the Tool
 

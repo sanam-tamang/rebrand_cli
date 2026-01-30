@@ -1,3 +1,11 @@
+## 2.1.0
+- **New: Optional Configuration:** All fields in `rebrand_config.json` are now optional.
+- **New: Feature Flags:** Added `enable_splash`, `enable_launcher_icon`, `enable_package_rename`, `enable_app_label` to control specific features.
+- **New: Platform Selection:** Added `enable_android` and `enable_ios` to control platform-specific rebranding.
+- **New: Splash Screen Scaling:** Added `scaling` option to `splash_config` to control logo size.
+- **New: Input Validation:** Added validation for configuration values (paths, package name format, colors).
+- **Improved:** `AssetGenerationTask` now scales only the splash screen image, preserving the original image for launcher icons.
+
 ## 2.0.0
 
 - **New: Auto-Padding Engine for Splash Screens:** Prevents image cropping on Android 12+ by automatically adding padding to the splash screen image.

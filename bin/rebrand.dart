@@ -13,7 +13,11 @@ import 'package:rebrand_cli/rebrand_service.dart';
 ///
 /// The tool must be run from the root directory of a Flutter project
 /// and requires a valid `rebrand_config.json` configuration file.
-void main() async {
+void main(List<String> args) async {
+  if (args.isNotEmpty) {
+    Directory.current = args[0];
+  }
+
   // ANSI Color Codes
   const cyan = '\x1B[36m';
   const green = '\x1B[32m';
@@ -23,7 +27,7 @@ void main() async {
   // 1. Welcome Banner
   print('''
 $cyan+------------------------------------------+
-|          🚀 REBRAND CLI v2.0.0           |
+|          🚀 REBRAND CLI v2.1.0           |
 |      Automated Flutter Rebranding        |
 +------------------------------------------+$reset
 ''');
@@ -56,5 +60,6 @@ $cyan+------------------------------------------+
     print("\n$green✨ SUCCESS: Your project is ready to launch!$reset\n");
   } catch (e) {
     print("\n❌ ${white}Critical Error: $e$reset");
+    exit(1);
   }
 }
