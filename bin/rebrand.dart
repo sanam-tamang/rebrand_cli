@@ -23,7 +23,7 @@ void main() async {
   // 1. Welcome Banner
   print('''
 $cyan+------------------------------------------+
-|          🚀 REBRAND CLI v1.0.5           |
+|          🚀 REBRAND CLI v2.0.0           |
 |      Automated Flutter Rebranding        |
 +------------------------------------------+$reset
 ''');

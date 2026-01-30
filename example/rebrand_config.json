@@ -1,0 +1,10 @@
+{
+    "app_name": "Rebranded App",
+    "package_name": "com.rebranded.app",
+    "icon_path": "assets/logo.png",
+    "splash_config": {
+        "color": "#FFFFFF",
+        "image": "assets/logo.png",
+        "scaling": 0.7
+    }
+}
