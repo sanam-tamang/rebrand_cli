@@ -10,7 +10,27 @@
     "enable_ios": true,
     "splash_config": {
         "color": "#FFFFFF",
+        "dark_color": "#111111",
         "image": "assets/logo.png",
-        "scaling": 0.7
+        "dark_image": "assets/logo_dark.png",
+        "gravity": "center",
+        "ios_content_mode": "center",
+        "fullscreen": false,
+        "branding": "assets/branding.png",
+        "branding_dark": "assets/branding_dark.png",
+        "branding_mode": "bottom",
+        "branding_bottom_padding": 24,
+        "scaling": 0.7,
+        "auto_pad": true,
+        "android_12": {
+            "color": "#FFFFFF",
+            "dark_color": "#111111",
+            "image": "assets/logo.png",
+            "dark_image": "assets/logo_dark.png",
+            "icon_background_color": "#FFFFFF",
+            "icon_background_color_dark": "#000000",
+            "branding": "assets/branding.png",
+            "branding_dark": "assets/branding_dark.png"
+        }
     }
 }

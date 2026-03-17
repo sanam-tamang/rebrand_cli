@@ -23,7 +23,7 @@ class RebrandService {
     if (tasks == null) {
       tasksToRun.add(ValidationTask(config));
       tasksToRun.add(BackupTask());
-      tasksToRun.add(SetupDependenciesTask());
+      tasksToRun.add(SetupDependenciesTask(config));
 
       if (config.enablePackageRename && config.packageName != null) {
         tasksToRun.add(PackageRenameTask(config));

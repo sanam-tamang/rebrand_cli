@@ -69,6 +69,92 @@ class RebrandConfig {
   /// Whether to enable rebranding for iOS.
   final bool enableIOS;
 
+  Map<String, dynamic> get splashConfig => splash ?? const <String, dynamic>{};
+
+  Map<String, dynamic> get android12SplashConfig {
+    final value = splashConfig['android_12'];
+    if (value is Map<String, dynamic>) {
+      return value;
+    }
+    if (value is Map) {
+      return value.map((key, value) => MapEntry(key.toString(), value));
+    }
+    return const <String, dynamic>{};
+  }
+
+  bool get hasEnabledActions =>
+      enableSplash ||
+      enableLauncherIcon ||
+      enablePackageRename ||
+      enableAppLabel;
+
+  bool get splashAutoPad => _readBool(splashConfig, 'auto_pad') ?? true;
+
+  String? get splashImagePath => _readString(splashConfig, 'image') ?? iconPath;
+
+  String? get splashDarkImagePath =>
+      _readString(splashConfig, 'dark_image') ??
+      _readString(splashConfig, 'image_dark');
+
+  String? get android12ImagePath =>
+      _readString(android12SplashConfig, 'image') ?? splashImagePath;
+
+  String? get android12DarkImagePath =>
+      _readString(android12SplashConfig, 'dark_image') ??
+      _readString(android12SplashConfig, 'image_dark') ??
+      splashDarkImagePath;
+
+  String get splashColor => _readString(splashConfig, 'color') ?? '#FFFFFF';
+
+  String? get splashDarkColor =>
+      _readString(splashConfig, 'dark_color') ??
+      _readString(splashConfig, 'color_dark');
+
+  String get splashGravity =>
+      _readString(splashConfig, 'gravity') ??
+      _readString(splashConfig, 'android_gravity') ??
+      'center';
+
+  String get splashIOSContentMode =>
+      _readString(splashConfig, 'ios_content_mode') ?? 'center';
+
+  String? get splashWebImageMode => _readString(splashConfig, 'web_image_mode');
+
+  bool get splashFullscreen => _readBool(splashConfig, 'fullscreen') ?? false;
+
+  String? get splashBranding => _readString(splashConfig, 'branding');
+
+  String? get splashBrandingDark => _readString(splashConfig, 'branding_dark');
+
+  String? get splashBrandingMode => _readString(splashConfig, 'branding_mode');
+
+  int? get splashBrandingBottomPadding =>
+      _readInt(splashConfig, 'branding_bottom_padding');
+
+  String? get splashAndroidScreenOrientation =>
+      _readString(splashConfig, 'android_screen_orientation');
+
+  String get android12Color =>
+      _readString(android12SplashConfig, 'color') ?? splashColor;
+
+  String? get android12DarkColor =>
+      _readString(android12SplashConfig, 'dark_color') ??
+      _readString(android12SplashConfig, 'color_dark') ??
+      splashDarkColor;
+
+  String? get android12IconBackgroundColor =>
+      _readString(android12SplashConfig, 'icon_background_color');
+
+  String? get android12IconBackgroundDarkColor =>
+      _readString(android12SplashConfig, 'icon_background_dark_color') ??
+      _readString(android12SplashConfig, 'icon_background_color_dark');
+
+  String? get android12Branding =>
+      _readString(android12SplashConfig, 'branding');
+
+  String? get android12BrandingDark =>
+      _readString(android12SplashConfig, 'branding_dark');
+
   /// Creates a new [RebrandConfig] instance.
   RebrandConfig({
     this.appName,
@@ -109,5 +195,29 @@ class RebrandConfig {
       enableAndroid: json['enable_android'] ?? true,
       enableIOS: json['enable_ios'] ?? true,
     );
+  }
+
+  static String? _readString(Map<String, dynamic> source, String key) {
+    final value = source[key];
+    if (value is String && value.trim().isNotEmpty) {
+      return value.trim();
+    }
+    return null;
+  }
+
+  static bool? _readBool(Map<String, dynamic> source, String key) {
+    final value = source[key];
+    return value is bool ? value : null;
+  }
+
+  static int? _readInt(Map<String, dynamic> source, String key) {
+    final value = source[key];
+    if (value is int) {
+      return value;
+    }
+    if (value is num) {
+      return value.toInt();
+    }
+    return null;
   }
 }

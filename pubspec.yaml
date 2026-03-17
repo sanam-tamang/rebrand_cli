@@ -1,8 +1,8 @@
 
 
 name: rebrand_cli
-description: A master orchestrator for Flutter rebranding. Automate app name, package name, bundle ID, and icon changes across Android and iOS with a single command.
-version: 2.1.0
+description: Rebrand Flutter apps from one CLI. Rename app/package IDs, update labels, and generate launcher icons plus native splash screens with Android 12 support.
+version: 2.2.0
 environment:
   sdk: ^3.10.3
 

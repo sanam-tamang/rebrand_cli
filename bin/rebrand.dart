@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:rebrand_cli/cli_options.dart';
 import 'package:rebrand_cli/rebrand_config.dart';
 import 'package:rebrand_cli/rebrand_service.dart';
 
@@ -14,8 +15,30 @@ import 'package:rebrand_cli/rebrand_service.dart';
 /// The tool must be run from the root directory of a Flutter project
 /// and requires a valid `rebrand_config.json` configuration file.
 void main(List<String> args) async {
-  if (args.isNotEmpty) {
-    Directory.current = args[0];
+  const version = '2.2.0';
+
+  late final CliOptions options;
+
+  try {
+    options = CliOptions.parse(args);
+  } on CliArgumentException catch (e) {
+    stderr.writeln('🚨 Argument Error: $e');
+    stderr.writeln(buildHelpText(executableName: 'rebrand', version: version));
+    exit(64);
+  }
+
+  if (options.showHelp) {
+    print(buildHelpText(executableName: 'rebrand', version: version));
+    return;
+  }
+
+  if (options.showVersion) {
+    print('rebrand_cli v$version');
+    return;
+  }
+
+  if (options.projectPath != null) {
+    Directory.current = options.projectPath!;
   }
 
   // ANSI Color Codes
@@ -27,7 +50,7 @@ void main(List<String> args) async {
   // 1. Welcome Banner
   print('''
 $cyan+------------------------------------------+
-|          🚀 REBRAND CLI v2.1.0           |
+|          🚀 REBRAND CLI v$version           |
 |      Automated Flutter Rebranding        |
 +------------------------------------------+$reset
 ''');
@@ -39,20 +62,31 @@ $cyan+------------------------------------------+
     return;
   }
 
-  final configFile = File('rebrand_config.json');
+  final configFile = File(options.configPath);
   if (!configFile.existsSync()) {
-    print("🚨 ${white}Error: 'rebrand_config.json' not found.$reset");
+    print(
+      "🚨 ${white}Error: Config file not found at '${options.configPath}'.$reset",
+    );
     print("👉 Create one to get started!");
     return;
   }
 
   try {
     final configData = jsonDecode(configFile.readAsStringSync());
-    final config = RebrandConfig.fromJson(configData);
+    if (configData is! Map) {
+      throw const FormatException(
+        'Configuration file must contain a top-level JSON object.',
+      );
+    }
+
+    final config = RebrandConfig.fromJson(
+      Map<String, dynamic>.from(configData),
+    );
     final service = RebrandService(config);
 
     print("$green▶ Target App:$reset ${config.appName}");
     print("$green▶ New ID:$reset     ${config.packageName}");
+    print("$green▶ Config File:$reset ${configFile.path}");
     print("$cyan------------------------------------------$reset");
 
     await service.execute();

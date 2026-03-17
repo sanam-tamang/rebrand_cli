@@ -11,6 +11,165 @@ class AssetGenerationTask extends RebrandTask {
   @override
   String get name => "Generating Icons & Splash (with Safe-Zone Logic)";
 
+  static String buildLauncherIconYaml(RebrandConfig config, String imagePath) {
+    final lines = <String>['flutter_launcher_icons:'];
+
+    _addYamlLine(
+      lines,
+      'android',
+      config.enableAndroid ? 'launcher_icon' : false,
+      indent: 2,
+    );
+    _addYamlLine(lines, 'ios', config.enableIOS, indent: 2);
+    _addYamlLine(lines, 'image_path', imagePath, indent: 2);
+    _addYamlLine(lines, 'min_sdk_android', 21, indent: 2);
+    _addYamlLine(
+      lines,
+      'adaptive_icon_background',
+      config.splashColor,
+      indent: 2,
+    );
+    _addYamlLine(lines, 'adaptive_icon_foreground', imagePath, indent: 2);
+
+    return '${lines.join('\n')}\n';
+  }
+
+  static String buildSplashYaml(
+    RebrandConfig config, {
+    required String imagePath,
+    String? darkImagePath,
+    required String android12ImagePath,
+    String? android12DarkImagePath,
+  }) {
+    final lines = <String>['flutter_native_splash:'];
+
+    _addYamlLine(lines, 'color', config.splashColor, indent: 2);
+    _addYamlLine(lines, 'image', imagePath, indent: 2);
+    _addYamlLine(lines, 'android_gravity', config.splashGravity, indent: 2);
+    _addYamlLine(
+      lines,
+      'ios_content_mode',
+      config.splashIOSContentMode,
+      indent: 2,
+    );
+    _addYamlLine(lines, 'android', config.enableAndroid, indent: 2);
+    _addYamlLine(lines, 'ios', config.enableIOS, indent: 2);
+    _addYamlLine(lines, 'fullscreen', config.splashFullscreen, indent: 2);
+
+    if (config.splashDarkColor != null) {
+      _addYamlLine(lines, 'color_dark', config.splashDarkColor!, indent: 2);
+    }
+    if (darkImagePath != null) {
+      _addYamlLine(lines, 'image_dark', darkImagePath, indent: 2);
+    }
+    if (config.splashWebImageMode != null) {
+      _addYamlLine(
+        lines,
+        'web_image_mode',
+        config.splashWebImageMode!,
+        indent: 2,
+      );
+    }
+    if (config.splashBranding != null) {
+      _addYamlLine(lines, 'branding', config.splashBranding!, indent: 2);
+    }
+    if (config.splashBrandingDark != null) {
+      _addYamlLine(
+        lines,
+        'branding_dark',
+        config.splashBrandingDark!,
+        indent: 2,
+      );
+    }
+    if (config.splashBrandingMode != null) {
+      _addYamlLine(
+        lines,
+        'branding_mode',
+        config.splashBrandingMode!,
+        indent: 2,
+      );
+    }
+    if (config.splashBrandingBottomPadding != null) {
+      _addYamlLine(
+        lines,
+        'branding_bottom_padding',
+        config.splashBrandingBottomPadding!,
+        indent: 2,
+      );
+    }
+    if (config.splashAndroidScreenOrientation != null) {
+      _addYamlLine(
+        lines,
+        'android_screen_orientation',
+        config.splashAndroidScreenOrientation!,
+        indent: 2,
+      );
+    }
+
+    if (config.enableAndroid) {
+      lines.add('  android_12:');
+      _addYamlLine(lines, 'color', config.android12Color, indent: 4);
+      _addYamlLine(lines, 'image', android12ImagePath, indent: 4);
+
+      if (config.android12DarkColor != null) {
+        _addYamlLine(
+          lines,
+          'color_dark',
+          config.android12DarkColor!,
+          indent: 4,
+        );
+      }
+      if (android12DarkImagePath != null) {
+        _addYamlLine(lines, 'image_dark', android12DarkImagePath, indent: 4);
+      }
+      if (config.android12IconBackgroundColor != null) {
+        _addYamlLine(
+          lines,
+          'icon_background_color',
+          config.android12IconBackgroundColor!,
+          indent: 4,
+        );
+      }
+      if (config.android12IconBackgroundDarkColor != null) {
+        _addYamlLine(
+          lines,
+          'icon_background_color_dark',
+          config.android12IconBackgroundDarkColor!,
+          indent: 4,
+        );
+      }
+      if (config.android12Branding != null) {
+        _addYamlLine(lines, 'branding', config.android12Branding!, indent: 4);
+      }
+      if (config.android12BrandingDark != null) {
+        _addYamlLine(
+          lines,
+          'branding_dark',
+          config.android12BrandingDark!,
+          indent: 4,
+        );
+      }
+    }
+
+    return '${lines.join('\n')}\n';
+  }
+
+  static void _addYamlLine(
+    List<String> lines,
+    String key,
+    Object value, {
+    required int indent,
+  }) {
+    final padding = ' ' * indent;
+    if (value is num || value is bool) {
+      lines.add('$padding$key: $value');
+      return;
+    }
+
+    final escapedValue = value.toString().replaceAll('"', '\\"');
+    lines.add('$padding$key: "$escapedValue"');
+  }
+
   static img.Image processImage(String iconPath, {double scaling = 0.65}) {
     final bytes = File(iconPath).readAsBytesSync();
     final original = img.decodeImage(bytes);
@@ -45,50 +204,79 @@ class AssetGenerationTask extends RebrandTask {
 
   @override
   Future<void> execute() async {
-    if (config.iconPath == null) {
-      print("⚠️ Skipping Asset Generation: icon_path is missing.");
-      return;
+    final tempFiles = <String>[];
+
+    try {
+      if (config.enableSplash) {
+        final splashImagePath = _prepareSplashImage(
+          config.splashImagePath,
+          'rebrand_processed_splash.png',
+          tempFiles,
+        );
+        final splashDarkImagePath = _prepareSplashImage(
+          config.splashDarkImagePath,
+          'rebrand_processed_splash_dark.png',
+          tempFiles,
+        );
+        final android12ImagePath = _prepareSplashImage(
+          config.android12ImagePath,
+          'rebrand_processed_android12_splash.png',
+          tempFiles,
+        );
+        final android12DarkImagePath = _prepareSplashImage(
+          config.android12DarkImagePath,
+          'rebrand_processed_android12_splash_dark.png',
+          tempFiles,
+        );
+
+        if (splashImagePath != null && android12ImagePath != null) {
+          await _writeAndRunSplash(
+            imagePath: splashImagePath,
+            darkImagePath: splashDarkImagePath,
+            android12ImagePath: android12ImagePath,
+            android12DarkImagePath: android12DarkImagePath,
+          );
+        }
+      }
+
+      if (config.enableLauncherIcon && config.iconPath != null) {
+        await _writeAndRunIcons(config.iconPath!);
+      }
+    } finally {
+      for (final path in tempFiles) {
+        final file = File(path);
+        if (file.existsSync()) {
+          file.deleteSync();
+        }
+      }
+    }
+  }
+
+  String? _prepareSplashImage(
+    String? sourcePath,
+    String outputPath,
+    List<String> tempFiles,
+  ) {
+    if (sourcePath == null) {
+      return null;
     }
 
-    // Use the scaling factor from the configuration
+    if (!config.splashAutoPad) {
+      return sourcePath;
+    }
+
     final processedImage = processImage(
-      config.iconPath!,
+      sourcePath,
       scaling: config.splashScreenScale,
     );
-
-    // Save the processed image for the native generators to use
-    final processedPath = 'rebrand_processed_asset.png';
-    File(processedPath).writeAsBytesSync(img.encodePng(processedImage));
-
-    if (config.enableSplash && config.splash != null) {
-      // Generate the splash using the perfectly padded image
-      await _writeAndRunSplash(processedPath);
-    }
-
-    if (config.enableLauncherIcon) {
-      // Generate launcher icons using the original image (no scaling)
-      await _writeAndRunIcons(config.iconPath!);
-    }
-
-    // Cleanup the temporary processed image
-    if (File(processedPath).existsSync()) {
-      File(processedPath).deleteSync();
-    }
+    File(outputPath).writeAsBytesSync(img.encodePng(processedImage));
+    tempFiles.add(outputPath);
+    return outputPath;
   }
 
   Future<void> _writeAndRunIcons(String imagePath) async {
     final tempYaml = File('rebrand_icons_temp.yaml');
-    final color = config.splash?['color'] ?? "#FFFFFF";
-
-    tempYaml.writeAsStringSync('''
-flutter_launcher_icons:
-  android: ${config.enableAndroid ? '"launcher_icon"' : 'false'}
-  ios: ${config.enableIOS}
-  image_path: "$imagePath"
-  min_sdk_android: 21
-  adaptive_icon_background: "$color"
-  adaptive_icon_foreground: "$imagePath"
-''');
+    tempYaml.writeAsStringSync(buildLauncherIconYaml(config, imagePath));
 
     final result = await Process.run('dart', [
       'run',
@@ -104,22 +292,22 @@ flutter_launcher_icons:
     tempYaml.deleteSync();
   }
 
-  Future<void> _writeAndRunSplash(String imagePath) async {
+  Future<void> _writeAndRunSplash({
+    required String imagePath,
+    String? darkImagePath,
+    required String android12ImagePath,
+    String? android12DarkImagePath,
+  }) async {
     final tempYaml = File('rebrand_temp.yaml');
-    final color = config.splash?['color'] ?? "#FFFFFF";
-
-    tempYaml.writeAsStringSync('''
-flutter_native_splash:
-  color: "$color"
-  image: "$imagePath"
-  android_gravity: center
-  ios_content_mode: center
-  android: ${config.enableAndroid}
-  ios: ${config.enableIOS}
-  android_12:
-    image: "$imagePath"
-    color: "$color"
-''');
+    tempYaml.writeAsStringSync(
+      buildSplashYaml(
+        config,
+        imagePath: imagePath,
+        darkImagePath: darkImagePath,
+        android12ImagePath: android12ImagePath,
+        android12DarkImagePath: android12DarkImagePath,
+      ),
+    );
 
     final result = await Process.run('dart', [
       'run',

@@ -1,7 +1,12 @@
 import 'dart:io';
+import '../rebrand_config.dart';
 import 'rebrand_task.dart';
 
 class SetupDependenciesTask extends RebrandTask {
+  final RebrandConfig config;
+
+  SetupDependenciesTask(this.config);
+
   @override
   String get name => "Validating & Installing Worker Packages";
 
@@ -14,11 +19,16 @@ class SetupDependenciesTask extends RebrandTask {
 
     final pubspecContent = pubspecFile.readAsStringSync();
 
-    final requiredWorkers = [
-      'change_app_package_name',
-      'flutter_launcher_icons',
-      'flutter_native_splash',
+    final requiredWorkers = <String>[
+      if (config.enablePackageRename) 'change_app_package_name',
+      if (config.enableLauncherIcon) 'flutter_launcher_icons',
+      if (config.enableSplash) 'flutter_native_splash',
     ];
+
+    if (requiredWorkers.isEmpty) {
+      print("   ℹ️ No worker packages needed for the selected actions.");
+      return;
+    }
 
     final missingWorkers = requiredWorkers
         .where((package) => !pubspecContent.contains(package))

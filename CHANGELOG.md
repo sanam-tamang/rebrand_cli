@@ -1,3 +1,11 @@
+## 2.2.0
+- Added a more robust CLI interface with `--help`, `--version`, `--project`, and `--config` options.
+- Fixed splash-only workflows so `splash_config.image` works even when `icon_path` is not provided.
+- Added expanded splash customization support including dark assets, branding, fullscreen mode, iOS content mode, and Android 12 options.
+- Added stronger validation for colors, image paths, gravity/content-mode values, and empty no-op configurations.
+- Improved worker package installation so only the required helper packages are added.
+- Expanded tests and refreshed README/example configuration for publishing.
+
 ## 2.1.0
 - **New: Optional Configuration:** All fields in `rebrand_config.json` are now optional.
 - **New: Feature Flags:** Added `enable_splash`, `enable_launcher_icon`, `enable_package_rename`, `enable_app_label` to control specific features.
