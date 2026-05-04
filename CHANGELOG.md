@@ -1,3 +1,7 @@
+## 3.2.0
+- **New: Organized Assets**: All generated configuration files and padded images are now stored in the `assets/rebrand/` directory to keep the project root clean.
+- **Improved**: Added automatic directory creation for the new assets path.
+
 ## 3.1.2
 - **Chore**: Verified complete removal of `CleanupTask` and all manual asset tracking logic.
 - **Improved**: Ensured workspace is clean of any legacy cleanup artifacts.
