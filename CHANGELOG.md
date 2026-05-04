@@ -1,3 +1,7 @@
+## 3.1.1
+- **Chore**: Finalized removal of legacy cleanup logic and asset management utilities.
+- **Improved**: Verified all tests and analysis pass in the new simplified architecture.
+
 ## 3.1.0
 - **New: Persistent Configuration**: Worker YAML files (`rebrand_splash.yaml`, `rebrand_launcher.yaml`, `rebrand_rename.yaml`) are now saved in the project root for manual control.
 - **Improved**: Removed all manual cleanup logic. All asset management is now left to the worker packages or the user.
