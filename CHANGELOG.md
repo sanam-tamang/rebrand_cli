@@ -1,3 +1,7 @@
+## 3.1.2
+- **Chore**: Verified complete removal of `CleanupTask` and all manual asset tracking logic.
+- **Improved**: Ensured workspace is clean of any legacy cleanup artifacts.
+
 ## 3.1.1
 - **Chore**: Finalized removal of legacy cleanup logic and asset management utilities.
 - **Improved**: Verified all tests and analysis pass in the new simplified architecture.
