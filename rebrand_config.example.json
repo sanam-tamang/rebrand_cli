@@ -1,0 +1,23 @@
+{
+    "app_name": "My New App",
+    "package_name": "com.example.mynewapp",
+    "icon_path": "assets/app_icon.png",
+    "splash_config": {
+        "color": "#FFFFFF",
+        "image": "assets/splash_logo.png",
+        "dark_color": "#121212",
+        "dark_image": "assets/splash_logo_dark.png",
+        "android_gravity": "center",
+        "ios_content_mode": "center",
+        "fullscreen": true,
+        "auto_pad": true,
+        "android_12": {
+            "color": "#FFFFFF",
+            "image": "assets/splash_logo.png",
+            "icon_background_color": "#FFFFFF"
+        }
+    },
+    "enable_android": true,
+    "enable_ios": true,
+    "clear_splash": false
+}

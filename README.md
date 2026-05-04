@@ -83,12 +83,9 @@ rebrand --version
   "app_name": "My New App",
   "package_name": "com.example.mynewapp",
   "icon_path": "assets/logo.png",
-  "enable_splash": true,
-  "enable_launcher_icon": true,
-  "enable_package_rename": true,
-  "enable_app_label": true,
   "enable_android": true,
   "enable_ios": true,
+  "clear_splash": false,
   "splash_config": {
     "color": "#FFFFFF",
     "dark_color": "#111111",
@@ -119,19 +116,25 @@ rebrand --version
 
 ## Configuration
 
+### Simple Model: Data Presence = Auto-Enable
+
+If you provide data, it's automatically applied:
+- ✅ Provide `app_name` → App label updated
+- ✅ Provide `package_name` → Package renamed
+- ✅ Provide `icon_path` → Launcher icons generated
+- ✅ Provide `splash_config` → Splash screen generated
+
+No need for `enable_*` flags—they're automatic!
+
 ### Top-level fields
 
-- `app_name` App display name
-- `package_name` New Android/iOS identifier like `com.company.app`
-- `icon_path` Source image for launcher icon generation
-- `enable_splash` Enable splash generation
-- `enable_launcher_icon` Enable launcher icon generation
-- `enable_package_rename` Enable package / bundle ID rename
-- `enable_app_label` Enable app label update
-- `enable_android` Apply supported changes on Android
-- `enable_ios` Apply supported changes on iOS
-
-At least one action must be enabled, either explicitly or by providing the related config values.
+- `app_name` App display name (if provided → updated)
+- `package_name` New Android/iOS identifier like `com.company.app` (if provided → renamed)
+- `icon_path` Source image for launcher icon generation (if provided → generated)
+- `splash_config` Splash screen configuration (if provided → generated)
+- `clear_splash` Remove existing splash screen (default: false). Set to true to delete splash and regenerate
+- `enable_android` Apply changes on Android (default: true)
+- `enable_ios` Apply changes on iOS (default: true)
 
 ### `splash_config` fields
 
@@ -179,6 +182,36 @@ By default, Rebrand CLI auto-pads the splash image so Android 12's circular mask
   }
 }
 ```
+
+### Removing Splash Screens
+
+To completely remove an existing splash screen:
+
+```json
+{
+  "clear_splash": true,
+  "splash_config": null
+}
+```
+
+This will:
+- Remove `flutter_native_splash` from `pubspec.yaml`
+- Delete all splash-related configuration and files
+- Restore app to using default Flutter splash
+
+To remove splash AND add a new one:
+
+```json
+{
+  "clear_splash": true,
+  "splash_config": {
+    "color": "#NEW_COLOR",
+    "image": "assets/new_splash.png"
+  }
+}
+```
+
+This removes old splash, then generates fresh one with new config.
 
 ## What the CLI does during a run
 

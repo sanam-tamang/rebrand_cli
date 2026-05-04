@@ -3,6 +3,7 @@ import 'package:path/path.dart' as p;
 import 'rebrand_config.dart';
 import 'tasks/asset_generation_task.dart';
 import 'tasks/backup_task.dart';
+import 'tasks/cleanup_task.dart';
 import 'tasks/label_update_task.dart';
 import 'tasks/package_rename_task.dart';
 import 'tasks/project_sync_task.dart';
@@ -25,15 +26,21 @@ class RebrandService {
       tasksToRun.add(BackupTask());
       tasksToRun.add(SetupDependenciesTask(config));
 
-      if (config.enablePackageRename && config.packageName != null) {
+      // Clear splash if requested
+      if (config.shouldClearSplash) {
+        tasksToRun.add(CleanupTask(config));
+      }
+
+      // Auto-enable if data provided
+      if (config.packageName != null) {
         tasksToRun.add(PackageRenameTask(config));
       }
 
-      if (config.enableAppLabel && config.appName != null) {
+      if (config.appName != null) {
         tasksToRun.add(LabelUpdateTask(config));
       }
 
-      if (config.enableSplash || config.enableLauncherIcon) {
+      if (config.splash != null || config.iconPath != null) {
         tasksToRun.add(AssetGenerationTask(config));
       }
 

@@ -17,9 +17,9 @@ class ValidationTask extends RebrandTask {
     }
 
     // 1. Validate Package Name
-    if (config.enablePackageRename) {
-      if (config.packageName == null || config.packageName!.isEmpty) {
-        throw "Package name is required when 'enable_package_rename' is true.";
+    if (config.packageName != null) {
+      if (config.packageName!.isEmpty) {
+        throw "Package name cannot be empty.";
       }
       if (!_isValidPackageName(config.packageName!)) {
         throw "Invalid package name format: ${config.packageName}. Expected format: com.example.app (lowercase, dots, no special chars)";
@@ -27,16 +27,16 @@ class ValidationTask extends RebrandTask {
     }
 
     // 2. Validate App Name
-    if (config.enableAppLabel) {
-      if (config.appName == null || config.appName!.isEmpty) {
-        throw "App name is required when 'enable_app_label' is true.";
+    if (config.appName != null) {
+      if (config.appName!.isEmpty) {
+        throw "App name cannot be empty.";
       }
     }
 
     // 3. Validate Icon Path
-    if (config.enableLauncherIcon) {
-      if (config.iconPath == null || config.iconPath!.isEmpty) {
-        throw "Icon path is required when 'enable_launcher_icon' is true.";
+    if (config.iconPath != null) {
+      if (config.iconPath!.isEmpty) {
+        throw "Icon path cannot be empty.";
       }
       if (!File(config.iconPath!).existsSync()) {
         throw "Icon file not found at: ${config.iconPath}";
@@ -44,7 +44,7 @@ class ValidationTask extends RebrandTask {
     }
 
     // 4. Validate Splash Configuration
-    if (config.enableSplash) {
+    if (config.splash != null) {
       final rawAndroid12 = config.splashConfig['android_12'];
       if (rawAndroid12 != null && rawAndroid12 is! Map) {
         throw "'splash_config.android_12' must be a JSON object.";

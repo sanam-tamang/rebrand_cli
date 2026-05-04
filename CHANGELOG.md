@@ -1,3 +1,10 @@
+## 3.0.0
+- **BREAKING: Simplified Configuration**: Removed redundant `enable_*` flags. Intent is now inferred from data presence.
+- **Improved Splash Logic**: `clear_splash` is now implicitly `true` when `splash_config` is provided, ensuring a clean state.
+- **New AssetManager**: Added utility for tracking and removing assets, improving cleanup reliability.
+- **Refined Branding**: Improved handling of branding logos and their removal.
+- **Fixed Syntax Errors**: Resolved multiple compilation errors and broken tests.
+
 ## 2.2.0
 - Added a more robust CLI interface with `--help`, `--version`, `--project`, and `--config` options.
 - Fixed splash-only workflows so `splash_config.image` works even when `icon_path` is not provided.

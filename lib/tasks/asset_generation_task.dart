@@ -207,7 +207,7 @@ class AssetGenerationTask extends RebrandTask {
     final tempFiles = <String>[];
 
     try {
-      if (config.enableSplash) {
+      if (config.splash != null) {
         final splashImagePath = _prepareSplashImage(
           config.splashImagePath,
           'rebrand_processed_splash.png',
@@ -239,7 +239,7 @@ class AssetGenerationTask extends RebrandTask {
         }
       }
 
-      if (config.enableLauncherIcon && config.iconPath != null) {
+      if (config.iconPath != null) {
         await _writeAndRunIcons(config.iconPath!);
       }
     } finally {

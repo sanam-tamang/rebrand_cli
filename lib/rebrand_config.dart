@@ -51,23 +51,18 @@ class RebrandConfig {
   /// Defaults to 0.65 if not specified in the configuration.
   final double splashScreenScale;
 
-  /// Whether to generate the splash screen.
-  final bool enableSplash;
-
-  /// Whether to generate launcher icons.
-  final bool enableLauncherIcon;
-
-  /// Whether to rename the package (Bundle ID).
-  final bool enablePackageRename;
-
-  /// Whether to update the app label (App Name).
-  final bool enableAppLabel;
-
   /// Whether to enable rebranding for Android.
   final bool enableAndroid;
 
   /// Whether to enable rebranding for iOS.
   final bool enableIOS;
+
+  /// Whether to clear/remove the splash screen (remove config & files).
+  /// When true, removes splash from pubspec.yaml and deletes splash files.
+  /// Note: Only clearSplash is needed because:
+  /// - appName, packageName, iconPath are always applied if provided
+  /// - Only splash is optional and can be removed
+  final bool clearSplash;
 
   Map<String, dynamic> get splashConfig => splash ?? const <String, dynamic>{};
 
@@ -82,11 +77,23 @@ class RebrandConfig {
     return const <String, dynamic>{};
   }
 
-  bool get hasEnabledActions =>
-      enableSplash ||
-      enableLauncherIcon ||
-      enablePackageRename ||
-      enableAppLabel;
+  /// Check if there are any data to process or actions to take
+  bool get hasActions =>
+      appName != null ||
+      packageName != null ||
+      iconPath != null ||
+      splash != null ||
+      clearSplash;
+
+  /// Alias for hasActions to maintain compatibility with legacy code
+  bool get hasEnabledActions => hasActions;
+
+  /// Check if splash should be removed
+  /// 
+  /// LOGIC: 
+  /// 1. If user explicitly said clear_splash: true
+  /// 2. If user provided splash_config (implicitly clear old before new)
+  bool get shouldClearSplash => clearSplash || splash != null;
 
   bool get splashAutoPad => _readBool(splashConfig, 'auto_pad') ?? true;
 
@@ -156,25 +163,25 @@ class RebrandConfig {
       _readString(android12SplashConfig, 'branding_dark');
 
   /// Creates a new [RebrandConfig] instance.
+  ///
+  /// All data fields (appName, packageName, iconPath, splash) are auto-enabled
+  /// if provided. Only clearSplash can explicitly disable splash removal.
   RebrandConfig({
     this.appName,
     this.packageName,
     this.iconPath,
     this.splash,
     this.splashScreenScale = 0.65,
-    this.enableSplash = true,
-    this.enableLauncherIcon = true,
-    this.enablePackageRename = true,
-    this.enableAppLabel = true,
     this.enableAndroid = true,
     this.enableIOS = true,
+    this.clearSplash = false,
   });
 
   /// Creates a [RebrandConfig] instance from a JSON map.
   ///
-  /// The JSON structure should match the expected configuration format.
+  /// Simple model: if data is provided, it's automatically enabled.
   /// Optional keys: 'app_name', 'package_name', 'icon_path', 'splash_config'.
-  /// Optional flags: 'enable_splash', 'enable_launcher_icon', 'enable_package_rename', 'enable_app_label', 'enable_android', 'enable_ios'.
+  /// Optional flags: 'enable_android', 'enable_ios', 'clear_splash'.
   factory RebrandConfig.fromJson(Map<String, dynamic> json) {
     final appName = json['app_name'];
     final packageName = json['package_name'];
@@ -187,13 +194,9 @@ class RebrandConfig {
       iconPath: iconPath,
       splash: splash,
       splashScreenScale: (splash?['scaling'] as num?)?.toDouble() ?? 0.65,
-      enableSplash: json['enable_splash'] ?? (splash != null),
-      enableLauncherIcon: json['enable_launcher_icon'] ?? (iconPath != null),
-      enablePackageRename:
-          json['enable_package_rename'] ?? (packageName != null),
-      enableAppLabel: json['enable_app_label'] ?? (appName != null),
       enableAndroid: json['enable_android'] ?? true,
       enableIOS: json['enable_ios'] ?? true,
+      clearSplash: json['clear_splash'] ?? false,
     );
   }
 

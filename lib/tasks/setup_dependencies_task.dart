@@ -20,9 +20,9 @@ class SetupDependenciesTask extends RebrandTask {
     final pubspecContent = pubspecFile.readAsStringSync();
 
     final requiredWorkers = <String>[
-      if (config.enablePackageRename) 'change_app_package_name',
-      if (config.enableLauncherIcon) 'flutter_launcher_icons',
-      if (config.enableSplash) 'flutter_native_splash',
+      if (config.packageName != null) 'change_app_package_name',
+      if (config.iconPath != null) 'flutter_launcher_icons',
+      if (config.splash != null) 'flutter_native_splash',
     ];
 
     if (requiredWorkers.isEmpty) {

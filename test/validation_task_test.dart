@@ -33,25 +33,16 @@ void main() {
       }
     });
 
-    test('fails when no actions are enabled', () async {
-      final config = RebrandConfig(
-        enableSplash: false,
-        enableLauncherIcon: false,
-        enablePackageRename: false,
-        enableAppLabel: false,
-      );
+    test('fails when no actions are provided', () async {
+      final config = RebrandConfig();
 
       final task = ValidationTask(config);
 
       expect(task.execute(), throwsA(isA<String>()));
     });
 
-    test('allows splash-only configuration without icon_path', () async {
+    test('allows splash-only configuration', () async {
       final config = RebrandConfig(
-        enableSplash: true,
-        enableLauncherIcon: false,
-        enablePackageRename: false,
-        enableAppLabel: false,
         splash: {
           'image': splashPath,
           'dark_image': darkSplashPath,
@@ -71,10 +62,6 @@ void main() {
       () async {
         final config = RebrandConfig(
           splashScreenScale: 2,
-          enableSplash: true,
-          enableLauncherIcon: false,
-          enablePackageRename: false,
-          enableAppLabel: false,
           splash: {'image': splashPath},
         );
 
