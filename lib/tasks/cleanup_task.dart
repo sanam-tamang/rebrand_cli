@@ -22,27 +22,22 @@ class CleanupTask extends RebrandTask {
   @override
   Future<void> execute() async {
     if (!config.shouldClearSplash) {
-      return; // Nothing to clean
+      return; 
     }
 
-    print("  🗑️  Removing splash assets & configuration...");
+    print("  🗑️  Removing splash screen using native tool...");
 
-    // 1. Run native removal tool first (handles most platform files)
+    // 1. Run native removal tool (let the package handle it)
     try {
       await Process.run('dart', [
         'run',
         'flutter_native_splash:remove',
       ], runInShell: true);
-    } catch (_) {
-      // Ignore if tool not found or fails
-    }
+    } catch (_) {}
 
     // 2. Remove splash config from pubspec.yaml
     await AssetManager.removeFromPubspec('flutter_native_splash');
 
-    // 3. Remove any tracked assets
-    await AssetManager.removeAssetType(AssetType.splashScreen);
-
-    print("  ✓ Splash cleaned up");
+    print("  ✓ Splash removed");
   }
 }

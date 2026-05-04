@@ -1,3 +1,7 @@
+## 3.0.1
+- **Fix**: Removed explicit file deletion that caused `PathNotFoundException` during splash generation.
+- **Improved**: Let `flutter_native_splash` handle all asset updates automatically.
+
 ## 3.0.0
 - **BREAKING: Simplified Configuration**: Removed redundant `enable_*` flags. Intent is now inferred from data presence.
 - **Improved Splash Logic**: `clear_splash` is now implicitly `true` when `splash_config` is provided, ensuring a clean state.
