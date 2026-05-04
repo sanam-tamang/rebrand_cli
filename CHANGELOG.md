@@ -1,3 +1,8 @@
+## 3.1.0
+- **New: Persistent Configuration**: Worker YAML files (`rebrand_splash.yaml`, `rebrand_launcher.yaml`, `rebrand_rename.yaml`) are now saved in the project root for manual control.
+- **Improved**: Removed all manual cleanup logic. All asset management is now left to the worker packages or the user.
+- **Improved**: Padded splash assets are now saved as persistent files (e.g., `rebrand_splash_padded.png`) when `auto_pad` is enabled.
+
 ## 3.0.1
 - **Fix**: Removed explicit file deletion that caused `PathNotFoundException` during splash generation.
 - **Improved**: Let `flutter_native_splash` handle all asset updates automatically.

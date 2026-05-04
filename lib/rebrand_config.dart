@@ -88,9 +88,6 @@ class RebrandConfig {
   /// Alias for hasActions to maintain compatibility with legacy code
   bool get hasEnabledActions => hasActions;
 
-  /// Check if splash should be COMPLETELY removed (no new data provided)
-  bool get shouldClearSplash => clearSplash && splash == null;
-
   bool get splashAutoPad => _readBool(splashConfig, 'auto_pad') ?? true;
 
   String? get splashImagePath => _readString(splashConfig, 'image') ?? iconPath;
