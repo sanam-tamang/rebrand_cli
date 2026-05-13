@@ -55,6 +55,12 @@ rebrand --version
 - `-v, --version` Show package version
 - `-p, --project <path>` Target Flutter project root
 - `-c, --config <path>` Custom config file path
+- `--rename` Run package rename only
+- `--label`, `--app-name` Run app label update only
+- `--launcher` Run launcher icon generation only
+- `--splash` Run splash generation only
+
+If you pass explicit action flags, Rebrand CLI will run only the requested task(s) instead of all available config-driven actions.
 
 ## Quick start
 

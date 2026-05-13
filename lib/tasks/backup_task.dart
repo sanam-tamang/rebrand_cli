@@ -2,6 +2,10 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'rebrand_task.dart';
 
+/// Creates a local backup of key files before rebranding begins.
+///
+/// The backup includes `pubspec.yaml`, the Android directory, and the iOS
+/// directory so the service can restore the project if any later task fails.
 class BackupTask extends RebrandTask {
   @override
   String get name => "Creating Project Backup";

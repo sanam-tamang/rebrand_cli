@@ -30,11 +30,17 @@ void main() {
       testProjectDir.createSync(recursive: true);
 
       // Create a dummy project structure
-      File('${testProjectDir.path}/pubspec.yaml').writeAsStringSync('name: dummy_project');
+      File(
+        '${testProjectDir.path}/pubspec.yaml',
+      ).writeAsStringSync('name: dummy_project');
       Directory('${testProjectDir.path}/android').createSync();
-      File('${testProjectDir.path}/android/dummy_file.txt').writeAsStringSync('android content');
+      File(
+        '${testProjectDir.path}/android/dummy_file.txt',
+      ).writeAsStringSync('android content');
       Directory('${testProjectDir.path}/ios').createSync();
-      File('${testProjectDir.path}/ios/dummy_file.txt').writeAsStringSync('ios content');
+      File(
+        '${testProjectDir.path}/ios/dummy_file.txt',
+      ).writeAsStringSync('ios content');
 
       Directory.current = testProjectDir;
     });
@@ -56,10 +62,7 @@ void main() {
         splash: {'color': '#FFFFFF'},
       );
 
-      final tasks = [
-        BackupTask(),
-        MockFailingTask(),
-      ];
+      final tasks = [BackupTask(), MockFailingTask()];
 
       final service = RebrandService(config, tasks: tasks);
 

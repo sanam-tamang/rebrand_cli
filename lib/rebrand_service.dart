@@ -1,42 +1,71 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'rebrand_action.dart';
 import 'rebrand_config.dart';
 import 'tasks/asset_generation_task.dart';
 import 'tasks/backup_task.dart';
 import 'tasks/label_update_task.dart';
+import 'tasks/launcher_task.dart';
 import 'tasks/package_rename_task.dart';
 import 'tasks/project_sync_task.dart';
 import 'tasks/rebrand_task.dart';
 import 'tasks/setup_dependencies_task.dart';
+import 'tasks/splash_task.dart';
 import 'tasks/validation_task.dart';
 
+/// Orchestrates rebranding tasks for a loaded [RebrandConfig].
+///
+/// This service builds a task pipeline based on either explicit selected actions
+/// from CLI flags or the data present in the config. It handles validation,
+/// backup creation, dependency setup, task execution, rollback, and cleanup.
 class RebrandService {
   final RebrandConfig config;
-
+  final Set<RebrandAction>? selectedActions;
   final List<RebrandTask>? tasks;
 
-  RebrandService(this.config, {this.tasks});
+  RebrandService(this.config, {this.selectedActions, this.tasks});
 
   Future<void> execute() async {
     final List<RebrandTask> tasksToRun = tasks ?? [];
 
     if (tasks == null) {
-      tasksToRun.add(ValidationTask(config));
+      final hasExplicitActions =
+          selectedActions != null && selectedActions!.isNotEmpty;
+      final actions = selectedActions ?? _deriveActionsFromConfig();
+
+      tasksToRun.add(
+        ValidationTask(
+          config,
+          actions: actions,
+          explicitActions: hasExplicitActions,
+        ),
+      );
       tasksToRun.add(BackupTask());
-      tasksToRun.add(SetupDependenciesTask(config));
+      tasksToRun.add(SetupDependenciesTask(config, actions: actions));
 
-
-      // Auto-enable if data provided
-      if (config.packageName != null) {
-        tasksToRun.add(PackageRenameTask(config));
-      }
-
-      if (config.appName != null) {
-        tasksToRun.add(LabelUpdateTask(config));
-      }
-
-      if (config.splash != null || config.iconPath != null) {
-        tasksToRun.add(AssetGenerationTask(config));
+      if (hasExplicitActions) {
+        if (actions.contains(RebrandAction.rename)) {
+          tasksToRun.add(PackageRenameTask(config));
+        }
+        if (actions.contains(RebrandAction.label)) {
+          tasksToRun.add(LabelUpdateTask(config));
+        }
+        if (actions.contains(RebrandAction.launcher)) {
+          tasksToRun.add(LauncherTask(config));
+        }
+        if (actions.contains(RebrandAction.splash)) {
+          tasksToRun.add(SplashTask(config));
+        }
+      } else {
+        if (config.packageName != null) {
+          tasksToRun.add(PackageRenameTask(config));
+        }
+        if (config.appName != null) {
+          tasksToRun.add(LabelUpdateTask(config));
+        }
+        if (config.splash != null || config.iconPath != null) {
+          tasksToRun.add(AssetGenerationTask(config));
+        }
       }
 
       tasksToRun.add(ProjectSyncTask(config));
@@ -56,6 +85,23 @@ class RebrandService {
       print("\n❌ CRITICAL ERROR: $e");
       await _performRollback();
     }
+  }
+
+  Set<RebrandAction> _deriveActionsFromConfig() {
+    final actions = <RebrandAction>{};
+    if (config.packageName != null) {
+      actions.add(RebrandAction.rename);
+    }
+    if (config.appName != null) {
+      actions.add(RebrandAction.label);
+    }
+    if (config.iconPath != null) {
+      actions.add(RebrandAction.launcher);
+    }
+    if (config.splash != null || config.iconPath != null) {
+      actions.add(RebrandAction.splash);
+    }
+    return actions;
   }
 
   Future<void> _performRollback() async {

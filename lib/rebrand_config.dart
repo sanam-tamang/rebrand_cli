@@ -131,6 +131,10 @@ class RebrandConfig {
   int? get splashBrandingBottomPadding =>
       _readInt(splashConfig, 'branding_bottom_padding');
 
+  bool get shouldRename => packageName != null;
+  bool get shouldGenerateLauncher => iconPath != null;
+  bool get shouldGenerateSplash => splash != null || iconPath != null;
+
   String? get splashAndroidScreenOrientation =>
       _readString(splashConfig, 'android_screen_orientation');
 

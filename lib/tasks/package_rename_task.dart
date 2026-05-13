@@ -2,6 +2,10 @@ import 'dart:io';
 import '../rebrand_config.dart';
 import 'rebrand_task.dart';
 
+/// Renames the Android and iOS package/bundle identifiers.
+///
+/// This task uses `change_app_package_name` to apply the new package name from
+/// [RebrandConfig.packageName] across both Android and iOS.
 class PackageRenameTask extends RebrandTask {
   final RebrandConfig config;
 

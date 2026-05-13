@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:path/path.dart' as p;
 import 'package:rebrand_cli/cli_options.dart';
 import 'package:rebrand_cli/rebrand_config.dart';
 import 'package:rebrand_cli/rebrand_service.dart';
+import 'package:rebrand_cli/rebrand_action.dart';
 
 /// Entry point for the Rebrand CLI tool.
 ///
@@ -15,9 +17,8 @@ import 'package:rebrand_cli/rebrand_service.dart';
 /// The tool must be run from the root directory of a Flutter project
 /// and requires a valid `rebrand_config.json` configuration file.
 void main(List<String> args) async {
-  const version = '2.2.0';
-
   late final CliOptions options;
+  final version = _toolVersion() ?? 'unknown';
 
   try {
     options = CliOptions.parse(args);
@@ -82,7 +83,18 @@ $cyan+------------------------------------------+
     final config = RebrandConfig.fromJson(
       Map<String, dynamic>.from(configData),
     );
-    final service = RebrandService(config);
+
+    final selectedActions = <RebrandAction>{
+      if (options.renameOnly) RebrandAction.rename,
+      if (options.labelOnly) RebrandAction.label,
+      if (options.launcherOnly) RebrandAction.launcher,
+      if (options.splashOnly) RebrandAction.splash,
+    };
+
+    final service = RebrandService(
+      config,
+      selectedActions: selectedActions.isEmpty ? null : selectedActions,
+    );
 
     print("$green▶ Target App:$reset ${config.appName}");
     print("$green▶ New ID:$reset     ${config.packageName}");
@@ -95,5 +107,25 @@ $cyan+------------------------------------------+
   } catch (e) {
     print("\n❌ ${white}Critical Error: $e$reset");
     exit(1);
+  }
+}
+
+String? _toolVersion() {
+  try {
+    final script = File.fromUri(Platform.script);
+    final packageRoot = script.parent.parent;
+    final pubspecFile = File(p.join(packageRoot.path, 'pubspec.yaml'));
+    if (!pubspecFile.existsSync()) {
+      return null;
+    }
+
+    final content = pubspecFile.readAsStringSync();
+    final match = RegExp(
+      r'^version:\s*([\d\.\-\+]+)',
+      multiLine: true,
+    ).firstMatch(content);
+    return match?.group(1);
+  } catch (_) {
+    return null;
   }
 }

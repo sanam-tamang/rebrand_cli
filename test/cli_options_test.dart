@@ -28,5 +28,25 @@ void main() {
         throwsA(isA<CliArgumentException>()),
       );
     });
+
+    test('supports explicit action flags', () {
+      final options = CliOptions.parse([
+        '--rename',
+        '--label',
+        '--launcher',
+        '--splash',
+      ]);
+
+      expect(options.renameOnly, isTrue);
+      expect(options.labelOnly, isTrue);
+      expect(options.launcherOnly, isTrue);
+      expect(options.splashOnly, isTrue);
+    });
+
+    test('supports --app-name alias for label-only', () {
+      final options = CliOptions.parse(['--app-name']);
+
+      expect(options.labelOnly, isTrue);
+    });
   });
 }

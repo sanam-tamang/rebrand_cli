@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:rebrand_cli/rebrand_action.dart';
 import 'package:rebrand_cli/rebrand_config.dart';
 import 'package:rebrand_cli/tasks/validation_task.dart';
 import 'package:test/test.dart';
@@ -55,6 +56,29 @@ void main() {
       );
 
       await ValidationTask(config).execute();
+    });
+
+    test(
+      'allows rename-only validation with unrelated icon path missing',
+      () async {
+        final config = RebrandConfig(packageName: 'com.example.app');
+
+        await ValidationTask(
+          config,
+          actions: {RebrandAction.rename},
+          explicitActions: true,
+        ).execute();
+      },
+    );
+
+    test('allows label-only validation with explicit app-name flag', () async {
+      final config = RebrandConfig(appName: 'My App');
+
+      await ValidationTask(
+        config,
+        actions: {RebrandAction.label},
+        explicitActions: true,
+      ).execute();
     });
 
     test(

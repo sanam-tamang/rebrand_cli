@@ -2,6 +2,10 @@ import 'dart:io';
 import '../rebrand_config.dart';
 import 'rebrand_task.dart';
 
+/// Performs final project cleanup and dependency sync after rebranding.
+///
+/// This task runs `flutter clean`, `flutter pub get`, and on macOS it also
+/// runs `pod install` for iOS if a Podfile is present.
 class ProjectSyncTask extends RebrandTask {
   final RebrandConfig config;
 

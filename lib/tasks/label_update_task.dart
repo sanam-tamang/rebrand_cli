@@ -2,6 +2,10 @@ import 'dart:io';
 import '../rebrand_config.dart';
 import 'rebrand_task.dart';
 
+/// Updates the native Android and iOS application labels.
+///
+/// This task writes the configured `app_name` into Android `AndroidManifest.xml`
+/// and iOS `Info.plist` so the app displays the correct name on the launcher.
 class LabelUpdateTask extends RebrandTask {
   @override
   String get name => "Updating App Name to '${config.appName}'";
