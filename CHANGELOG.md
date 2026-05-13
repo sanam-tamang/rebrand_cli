@@ -1,3 +1,8 @@
+## 3.3.0
+- **New: Smart Flag Suggestions**: CLI now suggests correct flags when users type common typos (e.g., `--appname` suggests `--app-name`, `--icon` suggests `--launcher`, `--screen` suggests `--splash`).
+- **Improved: Full Documentation**: Added comprehensive dartdoc comments to all public classes, enums, and service orchestrators for better IDE support and offline documentation.
+- **Improved: Better Error Messages**: Unknown CLI flags now include helpful suggestions with emoji indicators.
+
 ## 3.2.0
 - **New: Organized Assets**: All generated configuration files and padded images are now stored in the `assets/rebrand/` directory to keep the project root clean.
 - **Improved**: Added automatic directory creation for the new assets path.

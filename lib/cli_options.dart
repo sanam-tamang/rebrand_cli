@@ -111,7 +111,7 @@ class CliOptions {
       }
 
       if (arg.startsWith('-')) {
-        throw CliArgumentException('Unknown option: $arg');
+        throw CliArgumentException(_suggestOption(arg));
       }
 
       projectPath = _assignProjectPath(projectPath, arg);
@@ -137,6 +137,107 @@ class CliOptions {
     }
 
     return nextValue;
+  }
+
+  static String _suggestOption(String arg) {
+    final suggestions = <String, String>{
+      '--appname': '--app-name (or --label)',
+      '--app_name': '--app-name (or --label)',
+      '-appname': '--app-name (or --label)',
+      '--label-name': '--app-name (or --label)',
+      '--app': '--app-name (or --label)',
+      '--icon': '--launcher',
+      '--icons': '--launcher',
+      '--icon-only': '--launcher',
+      '--screen': '--splash',
+      '--splash-only': '--splash',
+      '--package': '--rename',
+      '--package-only': '--rename',
+      '--rename-only': '--rename',
+      '--rename-package': '--rename',
+      '--version-only': '--version',
+      '-version': '--version',
+      '--h': '-h (or --help)',
+      '-help': '-h (or --help)',
+      '--v': '-v (or --version)',
+      '-proj': '-p (or --project)',
+      '--proj': '--project',
+      '-cfg': '-c (or --config)',
+      '--cfg': '--config',
+    };
+
+    if (suggestions.containsKey(arg)) {
+      return 'Unknown option: $arg\n💡 Did you mean: ${suggestions[arg]}?';
+    }
+
+    // Fuzzy match against known flags
+    final known = [
+      '-h',
+      '--help',
+      '-v',
+      '--version',
+      '-p',
+      '--project',
+      '-c',
+      '--config',
+      '--rename',
+      '--label',
+      '--app-name',
+      '--launcher',
+      '--splash',
+    ];
+
+    final similar = _findSimilarFlags(arg, known);
+    if (similar.isNotEmpty) {
+      return 'Unknown option: $arg\n💡 Did you mean: ${similar.join(' or ')}?';
+    }
+
+    return 'Unknown option: $arg';
+  }
+
+  static List<String> _findSimilarFlags(String input, List<String> known) {
+    final matches = <String>[];
+    final normalized = input.toLowerCase();
+
+    for (final flag in known) {
+      // Exact substring match
+      if (flag.contains(normalized) || normalized.contains(flag)) {
+        matches.add(flag);
+        continue;
+      }
+
+      // Levenshtein-like: if removed or added 1-2 chars would match
+      if (_isSimilar(normalized, flag.toLowerCase())) {
+        matches.add(flag);
+      }
+    }
+
+    return matches.take(2).toList(); // Return up to 2 best matches
+  }
+
+  static bool _isSimilar(String a, String b) {
+    // Remove common prefixes/suffixes and check similarity
+    final aClean = a.replaceAll(RegExp(r'[-_]'), '');
+    final bClean = b.replaceAll(RegExp(r'[-_]'), '');
+
+    if (aClean.isEmpty || bClean.isEmpty) return false;
+
+    // Check if one is a prefix or suffix of the other (off by 1-2 chars)
+    final maxLen = aClean.length > bClean.length
+        ? aClean.length
+        : bClean.length;
+    final minLen = aClean.length < bClean.length
+        ? aClean.length
+        : bClean.length;
+    final diff = maxLen - minLen;
+
+    if (diff > 2) return false;
+
+    final overlapLen = minLen - diff;
+    if (overlapLen <= 0) return false;
+
+    return aClean.startsWith(bClean.substring(0, overlapLen)) ||
+        bClean.startsWith(aClean.substring(0, overlapLen));
   }
 }
 
