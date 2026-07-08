@@ -1,3 +1,8 @@
+## 3.3.1
+- **New: Init Templates**: Added `rebrand init` and `rebrand init --full` to scaffold minimal or full starter configs.
+- **Improved: Safe Initialization**: Existing config files are preserved unless `--force` is provided.
+- **Improved: Documentation**: README now guides beginners through install, setup, and first-run usage more clearly.
+
 ## 3.3.0
 - **New: Smart Flag Suggestions**: CLI now suggests correct flags when users type common typos (e.g., `--appname` suggests `--app-name`, `--icon` suggests `--launcher`, `--screen` suggests `--splash`).
 - **Improved: Full Documentation**: Added comprehensive dartdoc comments to all public classes, enums, and service orchestrators for better IDE support and offline documentation.
