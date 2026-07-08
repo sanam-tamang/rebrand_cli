@@ -48,5 +48,13 @@ void main() {
 
       expect(options.labelOnly, isTrue);
     });
+
+    test('supports init subcommand with full and force flags', () {
+      final options = CliOptions.parse(['init', '--full', '--force']);
+
+      expect(options.initCommand, isTrue);
+      expect(options.initFull, isTrue);
+      expect(options.forceOverwrite, isTrue);
+    });
   });
 }

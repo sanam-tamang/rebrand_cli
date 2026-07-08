@@ -21,6 +21,9 @@ class CliOptions {
   final bool labelOnly;
   final bool launcherOnly;
   final bool splashOnly;
+  final bool initCommand;
+  final bool initFull;
+  final bool forceOverwrite;
 
   const CliOptions({
     this.projectPath,
@@ -31,6 +34,9 @@ class CliOptions {
     this.labelOnly = false,
     this.launcherOnly = false,
     this.splashOnly = false,
+    this.initCommand = false,
+    this.initFull = false,
+    this.forceOverwrite = false,
   });
 
   factory CliOptions.parse(List<String> args) {
@@ -42,6 +48,9 @@ class CliOptions {
     var labelOnly = false;
     var launcherOnly = false;
     var splashOnly = false;
+    var initCommand = false;
+    var initFull = false;
+    var forceOverwrite = false;
 
     for (var i = 0; i < args.length; i++) {
       final arg = args[i];
@@ -53,6 +62,21 @@ class CliOptions {
 
       if (arg == '-v' || arg == '--version') {
         showVersion = true;
+        continue;
+      }
+
+      if (arg == 'init') {
+        initCommand = true;
+        continue;
+      }
+
+      if (arg == '--full') {
+        initFull = true;
+        continue;
+      }
+
+      if (arg == '--force') {
+        forceOverwrite = true;
         continue;
       }
 
@@ -126,6 +150,9 @@ class CliOptions {
       labelOnly: labelOnly,
       launcherOnly: launcherOnly,
       splashOnly: splashOnly,
+      initCommand: initCommand,
+      initFull: initFull,
+      forceOverwrite: forceOverwrite,
     );
   }
 
@@ -185,6 +212,9 @@ class CliOptions {
       '--app-name',
       '--launcher',
       '--splash',
+      'init',
+      '--full',
+      '--force',
     ];
 
     final similar = _findSimilarFlags(arg, known);
@@ -261,6 +291,12 @@ Options:
       Path to the Flutter project root to update.
   -c, --config <path>
       Load a custom JSON config file instead of the default rebrand_config.json.
+  init
+      Create a starter rebrand_config.json template. Uses a minimal example by default.
+  --full
+      Generate the full example config template when used with init.
+  --force
+      Overwrite an existing config file when used with init.
   --rename
       Rename the Android/iOS package identifier only. Uses package_name from the config.
   --label, --app-name
@@ -277,6 +313,9 @@ Notes:
 Examples:
   $executableName
   $executableName .
+  $executableName init
+  $executableName init --full
+  $executableName init --force
   $executableName --project ./example --config ./example/rebrand_config.json
 ''';
 }

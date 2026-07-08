@@ -1,74 +1,57 @@
+
 # 🚀 Rebrand CLI
 
-Rebrand Flutter apps from one CLI. Update the app name, package name / bundle ID, launcher icons, and native splash screens for Android and iOS with a single command.
-
-## Why use it?
-
-- Rename Android and iOS app identifiers from one config file
-- Update the app label shown on the home screen
-- Generate launcher icons
-- Generate native splash screens with Android 12 support
-- Auto-pad splash assets to avoid logo cropping on Android 12+
-- Roll back changes automatically if a task fails
-- Add only the helper packages actually required by the selected actions
+Rebrand a Flutter app in seconds. Change the app name, package ID, launcher icon, and native splash screen with one command.
 
 ## Install
 
-```bash
-dart pub global activate rebrand_cli
-```
-
-If `rebrand` is not found, add Dart pub cache to your `PATH`.
-
-### macOS / Linux
+Add the package to your Flutter app as a dev dependency:
 
 ```bash
-export PATH="$PATH:$HOME/.pub-cache/bin"
+flutter pub add dev:rebrand_cli
 ```
 
-### Windows PowerShell
-
-```powershell
-$env:Path += ";$env:LOCALAPPDATA\Pub\Cache\bin"
-```
-
-### Run without changing PATH
+Then run it from your Flutter app root:
 
 ```bash
-dart pub global run rebrand_cli:rebrand --help
+flutter pub run rebrand_cli:rebrand init
 ```
 
-## Command reference
+> This works best when you run the commands inside your app project, because the tool expects a Flutter project with a `pubspec.yaml` file in the current directory.
+
+---
+
+## ⚡ 30-second beginner path
+
+1. Open your Flutter project root.
+2. Generate a starter config:
 
 ```bash
-rebrand
-rebrand .
-rebrand --project ./my_app
-rebrand --project ./my_app --config ./my_app/rebrand_config.json
-rebrand --help
-rebrand --version
+flutter pub run rebrand_cli:rebrand init
 ```
 
-### Available options
+3. Edit the generated `rebrand_config.json` with your values.
+4. Run:
 
-- `-h, --help` Show CLI help
-- `-v, --version` Show package version
-- `-p, --project <path>` Target Flutter project root
-- `-c, --config <path>` Custom config file path
-- `--rename` Run package rename only
-- `--label`, `--app-name` Run app label update only
-- `--launcher` Run launcher icon generation only
-- `--splash` Run splash generation only
+```bash
+flutter pub run rebrand_cli:rebrand
+```
 
-If you pass explicit action flags, Rebrand CLI will run only the requested task(s) instead of all available config-driven actions.
+That is the minimal flow for most users.
 
-## Quick start
+If you want a more complete starter config, use:
 
-1. Go to your Flutter project root
-2. Create `rebrand_config.json`
-3. Run `rebrand`
+```bash
+flutter pub run rebrand_cli:rebrand init --full
+```
 
-### Minimal example
+> If `rebrand_config.json` already exists, the initializer will not overwrite it unless you add `--force`.
+
+---
+
+## ✨ Minimal example
+
+Copy this into `rebrand_config.json`:
 
 ```json
 {
@@ -82,7 +65,32 @@ If you pass explicit action flags, Rebrand CLI will run only the requested task(
 }
 ```
 
-### Full example
+Then run:
+
+```bash
+flutter pub run rebrand_cli:rebrand
+```
+
+This is the best starting point for a first-time user.
+
+---
+
+## 🧠 How it works
+
+Rebrand CLI reads your config and automatically applies the matching actions:
+
+- `app_name` → updates the app label
+- `package_name` → renames the Android/iOS package ID
+- `icon_path` → generates launcher icons
+- `splash_config` → generates native splash screens
+
+No `enable_*` flags are required when you supply the data directly.
+
+---
+
+## 🛠️ Full features (advanced)
+
+Use this section when you want richer splash, branding, and platform-specific options.
 
 ```json
 {
@@ -120,78 +128,35 @@ If you pass explicit action flags, Rebrand CLI will run only the requested task(
 }
 ```
 
-## Configuration
+---
 
-### Simple Model: Data Presence = Auto-Enable
-
-If you provide data, it's automatically applied:
-- ✅ Provide `app_name` → App label updated
-- ✅ Provide `package_name` → Package renamed
-- ✅ Provide `icon_path` → Launcher icons generated
-- ✅ Provide `splash_config` → Splash screen generated
-
-No need for `enable_*` flags—they're automatic!
+## 🔧 Common options
 
 ### Top-level fields
 
-- `app_name` App display name (if provided → updated)
-- `package_name` New Android/iOS identifier like `com.company.app` (if provided → renamed)
-- `icon_path` Source image for launcher icon generation (if provided → generated)
-- `splash_config` Splash screen configuration (if provided → generated)
-- `clear_splash` Remove existing splash screen (default: false). Set to true to delete splash and regenerate
-- `enable_android` Apply changes on Android (default: true)
-- `enable_ios` Apply changes on iOS (default: true)
+- `app_name` → app display name
+- `package_name` → new Android/iOS identifier, such as `com.company.app`
+- `icon_path` → source image for launcher icon generation
+- `splash_config` → splash screen configuration
+- `clear_splash` → remove existing splash config and files
+- `enable_android` → apply changes to Android
+- `enable_ios` → apply changes to iOS
 
-### `splash_config` fields
+### Splash fields
 
-- `color` Light-mode splash background color
-- `dark_color` Dark-mode splash background color
-- `image` Splash image path; falls back to `icon_path`
-- `dark_image` Dark-mode splash image path
-- `gravity` Android gravity like `center`, `bottom`, `fill`
-- `ios_content_mode` iOS content mode like `center`, `scaleAspectFit`, `scaleAspectFill`
-- `fullscreen` Hide Android status bar during splash
-- `branding` Optional branding image
-- `branding_dark` Optional dark branding image
-- `branding_mode` Branding position, typically `bottom`
-- `branding_bottom_padding` Bottom padding for branding image
-- `scaling` Auto-padding scale factor from `0 < value <= 1`
-- `auto_pad` Auto-pad splash images before generation; defaults to `true`
-- `android_12` Android 12 specific overrides
+- `color` / `dark_color` → background colors
+- `image` / `dark_image` → splash images
+- `gravity` → Android positioning
+- `ios_content_mode` → iOS positioning
+- `fullscreen` → hide the Android status bar during splash
+- `branding` / `branding_dark` → optional branding images
+- `auto_pad` → automatically pad splash images for Android 12
 
-### `splash_config.android_12` fields
+---
 
-- `color`
-- `dark_color`
-- `image`
-- `dark_image`
-- `icon_background_color`
-- `icon_background_color_dark`
-- `branding`
-- `branding_dark`
+## 🧹 Remove splash screens
 
-## How splash works
-
-Rebrand CLI does not render a splash screen itself at runtime. Instead, it generates a temporary `flutter_native_splash` configuration and runs the native splash generator for the target Flutter app.
-
-That means the splash is shown by the platform's native launch screen system:
-
-- **Android:** generated drawables / Android 12 splash resources
-- **iOS:** generated launch storyboard assets
-
-By default, Rebrand CLI auto-pads the splash image so Android 12's circular mask is less likely to crop the important part of your logo. If you want to supply a fully prepared asset yourself, set:
-
-```json
-{
-  "splash_config": {
-    "auto_pad": false
-  }
-}
-```
-
-### Removing Splash Screens
-
-To completely remove an existing splash screen:
+To remove an existing splash screen completely:
 
 ```json
 {
@@ -200,56 +165,40 @@ To completely remove an existing splash screen:
 }
 ```
 
-This will:
-- Remove `flutter_native_splash` from `pubspec.yaml`
-- Delete all splash-related configuration and files
-- Restore app to using default Flutter splash
+This removes splash config and restores the default Flutter splash behavior.
 
-To remove splash AND add a new one:
+---
 
-```json
-{
-  "clear_splash": true,
-  "splash_config": {
-    "color": "#NEW_COLOR",
-    "image": "assets/new_splash.png"
-  }
-}
-```
-
-This removes old splash, then generates fresh one with new config.
-
-## What the CLI does during a run
+## 🧪 What the CLI does during a run
 
 When you run `rebrand`, it can:
 
 1. Validate the config
 2. Create a backup of key project files
-3. Add helper packages if they are missing
-4. Rename package / bundle IDs
+3. Add helper packages if needed
+4. Rename package IDs
 5. Update app labels
 6. Generate icons and splash assets
-7. Run cleanup and dependency sync steps
+7. Clean up and sync dependencies
 8. Roll back automatically if something fails
 
-## Helper packages used internally
+---
 
-Rebrand CLI orchestrates these packages when needed:
+## 📦 Helper packages used internally
+
+Rebrand CLI uses these packages when needed:
 
 - `change_app_package_name`
 - `flutter_launcher_icons`
 - `flutter_native_splash`
 
-## Notes and limitations
+---
 
-- Splash appearance on Android 12 can vary by launcher
-- Native splash screens appear before Flutter renders its first frame
-- iOS launch screen caching may require uninstall/reinstall when testing repeated changes
-- Package renaming is handled as a project-level change and is not split per platform
+## 🧭 Example project
 
-## Example project
+See `example/rebrand_config.json` for a working sample configuration.
 
-See `example/rebrand_config.json` for a working sample config.
+---
 
 ## License
 

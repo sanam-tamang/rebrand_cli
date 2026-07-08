@@ -42,6 +42,11 @@ void main(List<String> args) async {
     Directory.current = options.projectPath!;
   }
 
+  if (options.initCommand) {
+    await _handleInitCommand(options);
+    return;
+  }
+
   // ANSI Color Codes
   const cyan = '\x1B[36m';
   const green = '\x1B[32m';
@@ -109,6 +114,76 @@ $cyan+------------------------------------------+
     exit(1);
   }
 }
+
+Future<void> _handleInitCommand(CliOptions options) async {
+  final configFile = File(options.configPath);
+  final targetPath = configFile.path;
+
+  if (configFile.existsSync() && !options.forceOverwrite) {
+    stderr.writeln(
+      'ℹ️ Config file already exists at $targetPath. Re-run with --force to overwrite it.',
+    );
+    return;
+  }
+
+  if (!configFile.parent.existsSync()) {
+    configFile.parent.createSync(recursive: true);
+  }
+
+  final template = options.initFull
+      ? _fullConfigTemplate()
+      : _minimalConfigTemplate();
+  configFile.writeAsStringSync(template);
+
+  final mode = options.initFull ? 'full' : 'minimal';
+  stdout.writeln('✅ Created $mode rebrand config at $targetPath');
+}
+
+String _minimalConfigTemplate() => '''{
+  "app_name": "My New App",
+  "package_name": "com.example.mynewapp",
+  "icon_path": "assets/logo.png",
+  "splash_config": {
+    "color": "#FFFFFF",
+    "image": "assets/logo.png"
+  }
+}
+''';
+
+String _fullConfigTemplate() => '''{
+  "app_name": "My New App",
+  "package_name": "com.example.mynewapp",
+  "icon_path": "assets/logo.png",
+  "enable_android": true,
+  "enable_ios": true,
+  "clear_splash": false,
+  "splash_config": {
+    "color": "#FFFFFF",
+    "dark_color": "#111111",
+    "image": "assets/logo.png",
+    "dark_image": "assets/logo_dark.png",
+    "gravity": "center",
+    "ios_content_mode": "center",
+    "fullscreen": false,
+    "branding": "assets/branding.png",
+    "branding_dark": "assets/branding_dark.png",
+    "branding_mode": "bottom",
+    "branding_bottom_padding": 24,
+    "scaling": 0.7,
+    "auto_pad": true,
+    "android_12": {
+      "color": "#FFFFFF",
+      "dark_color": "#111111",
+      "image": "assets/logo.png",
+      "dark_image": "assets/logo_dark.png",
+      "icon_background_color": "#FFFFFF",
+      "icon_background_color_dark": "#000000",
+      "branding": "assets/branding.png",
+      "branding_dark": "assets/branding_dark.png"
+    }
+  }
+}
+''';
 
 String? _toolVersion() {
   try {
